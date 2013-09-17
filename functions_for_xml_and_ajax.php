@@ -1973,21 +1973,17 @@ $theme 	=$wpdb->get_row($wpdb->prepare('SELECT * FROM '.$wpdb->prefix.'spidercal
  
    
 
-/////////HAZZARD//////////
+
 $eventID=$_GET['eventID'];
  
  ?>
- 
-  <link href="http://code.jquery.com/ui/1.10.3/themes/redmond/jquery-ui.css" rel='stylesheet'>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
-   <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+  <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+  <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/redmond/jquery-ui.css" />
+  
+
   <script>
-  $(function(){
-  	$('#accordion').accordion({
-  		active: false,
-  		collapsible: true
-  	});
-  });
+  
   
   function next(day_events,ev_id,theme_id,calendar_id,date,day)
   {
@@ -2062,17 +2058,21 @@ $eventID=$_GET['eventID'];
 }; 
   
 
-  
+  $(function(){
+  	$( ".events" ).accordion({
+  		collapsible: true,
+  		heightStyle: "content",
+  	});
+  });
   </script>
-  
-<div id="accordion" style="height:<?php echo $popup_height-30 ?>px;padding:0;">
- <?php 
  
 
-/////////////////////////////////////////////////////////////////////////
-/////////////////Aca carga los EVENTOS///////////////////////////////////
-//*//////////////////HAZZARD/////////////////////////////////////////////
- 
+<div class="events" style="height:<?php echo $popup_height-30 ?>px;">
+ <?php 
+// HAZZARD
+// Listado de eventos
+
+
  foreach($rows as $row)
  {
  for($i=0;$i<count($ev_id);$i++)
@@ -2080,17 +2080,9 @@ $eventID=$_GET['eventID'];
  echo '<h3>';
  if($show_event)
  echo ($i+1);
- echo ' '.$row->time. ' - ' .$row->title .'</h3>';
- $pathToMore = admin_url('admin-ajax.php?action=spiderbigcalendarrr').'&theme_id='.$theme_id.'&calendar_id='.$calendar_id.'&ev_ids='.$ev_ids.'&eventID='.$ev_id[$i].'&date='.$date.'&day='.$day.(($widget)?('&widget=1'):'').'&cur_page_url='.$path_sp_cal;
- $output = <<<EOT
- 	<div> 
- 		{$row->text_for_date}
- 		<p>
- 			<a href="{$pathToMore}">Ver...</a>
- 		</p>
- 	</div>
-EOT;
- echo $output;
+ echo $row->time . ' ';
+ echo ' '.$row->title .'</h3>';
+ echo '<div>'.$row->text_for_date.'</div>';
  }
  
  
@@ -2368,9 +2360,6 @@ return false;
  
     
 
-///////Cargo los js///////////
-///////////Hazzard////////////    
-
  
 $eventID=$_GET['eventID'];
  
@@ -2432,7 +2421,7 @@ $eventID=$_GET['eventID'];
 		   if(day_events[key]==ev_id && day_events[parseInt(key) -1] )
 		   {
 				   
-					alert('alo');
+					
 				   window.location='<?php echo admin_url('admin-ajax.php?action=spiderbigcalendarrr')?>&theme_id='+theme_id+'&calendar_id='+calendar_id+'&eventID='+day_events[parseInt(key) -1]+'&date='+date+'&ev_ids='+ev_ids+'&day='+day<?php if($widget)echo "+'&widget=1'" ?>;
 		   }
 	  }
@@ -2477,6 +2466,7 @@ $eventID=$_GET['eventID'];
 		.arrow
 		{
 		font-size:50px;
+		color:<?php echo $next_prev_event_arrowcolor ?>;
 		text-decoration:none;
 		
 		}
@@ -2485,20 +2475,12 @@ $eventID=$_GET['eventID'];
 		</style>
 		
 		
-		<table style="height:<?php echo $popup_height ?>px;width:100%;background-color:white; border-spacing:0"  align="center">
-<!-- 		<tr style="height:50px;">
-			<td style="height:50px;" >
-				<a href="javascript:prev([<?php echo $ev_ids_inline ?>],<?php echo $eventID ?>,<?php echo $theme_id ?>,<?php echo $calendar_id ?>,'<?php echo $date; ?>',<?php echo $day ?>,'<?php echo $ev_ids_inline ?>')"> 
-					<span class="arrow"  style="font-size:9px;display:inline-block;">&lt;</span>
-					Volver
-				</a>
-			</td>
-		</tr> -->
+		<table style="height:<?php echo $popup_height ?>px;width:100%;background-color:<?php echo $show_event_bgcolor ?>; border-spacing:0"  align="center">
 		<tr>
+		
 		<td  id="previous" onClick="prev([<?php echo $ev_ids_inline ?>],<?php echo $eventID ?>,<?php echo $theme_id ?>,<?php echo $calendar_id ?>,'<?php echo $date; ?>',<?php echo $day ?>,'<?php echo $ev_ids_inline ?>')"  style="<?php if(count($ev_id)==1 or $eventID==$ev_id[0] ) echo 'display:none' ?>;text-align:center" onMouseOver="document.getElementById('previous').style.backgroundColor='<?php echo $next_prev_event_bgcolor ?>'" onMouseOut="document.getElementById('previous').style.backgroundColor=''" >
 		
-		<!-- <span class="arrow"  >&lt;</span> -->
-		
+		<span class="arrow"  >&lt;</span>
 		
 		</td>
 		
@@ -2518,7 +2500,7 @@ $eventID=$_GET['eventID'];
 		$date_font_style="";
 		
 
-		echo '<div style="font-size:'.$date_size.'px; font-family:'.$date_font.'; '.$date_font_weight.'; '.$date_font_style.'  ">'.$activedatestr.'</div>';
+		echo '<div style="color:'.$date_color.';font-size:'.$date_size.'px; font-family:'.$date_font.'; '.$date_font_weight.'; '.$date_font_style.'  ">'.$activedatestr.'</div>';
 		if($title_style=="bold" or $title_style=="bold/italic" )
 		$font_weight="font-weight:bold";
 		else
@@ -2540,19 +2522,19 @@ $eventID=$_GET['eventID'];
 		if($row->text_for_date!='')
 		{		
 		if($row->date_end and $row->date_end!='0000-00-00')
-					echo '<div style="font-size:'.$date_size.'px; font-family:'.$date_font.'; '.$date_font_weight.'; '.$date_font_style.'  ">'.__('Date','sp_calendar').':'.str_replace("d",substr($row->date,8,2),str_replace("m",substr($row->date,5,2),str_replace("y",substr($row->date,0,4),$date_format1))).'&nbsp;-&nbsp;'.str_replace("d",substr($row->date_end,8,2),str_replace("m",substr($row->date_end,5,2),str_replace("y",substr($row->date_end,0,4),$date_format1))).'&nbsp;'.$row->time.'</div>';
+					echo '<div style="color:'.$date_color.';font-size:'.$date_size.'px; font-family:'.$date_font.'; '.$date_font_weight.'; '.$date_font_style.'  ">'.__('Date','sp_calendar').':'.str_replace("d",substr($row->date,8,2),str_replace("m",substr($row->date,5,2),str_replace("y",substr($row->date,0,4),$date_format1))).'&nbsp;-&nbsp;'.str_replace("d",substr($row->date_end,8,2),str_replace("m",substr($row->date_end,5,2),str_replace("y",substr($row->date_end,0,4),$date_format1))).'&nbsp;'.$row->time.'</div>';
 					else
-								echo '<div style="font-size:'.$date_size.'px; font-family:'.$date_font.'; '.$font_weight.'; '.$font_style.'  ">'.$row->time.'</div>';
+								echo '<div style="color:'.$date_color.';font-size:'.$date_size.'px; font-family:'.$date_font.'; '.$font_weight.'; '.$font_style.'  ">'.$row->time.'</div>';
 	
 
 
 if($show_repeat==1)						
 	{		
 		if($row->repeat_method=='daily')
-		echo '<div style="font-size:'.$date_size.'px; font-family:'.$date_font.'; '.$date_font_weight.'; '.$date_font_style.'  ">'.__('Repeat Every','sp_calendar').' ' .$repeat.' '.__('Day','sp_calendar').'</div>';
+		echo '<div style="color:'.$date_color.';font-size:'.$date_size.'px; font-family:'.$date_font.'; '.$date_font_weight.'; '.$date_font_style.'  ">'.__('Repeat Every','sp_calendar').' ' .$repeat.' '.__('Day','sp_calendar').'</div>';
 		if($row->repeat_method=='weekly')
 		{
-		echo '<div style="font-size:'.$date_size.'px; font-family:'.$date_font.'; '.$date_font_weight.'; '.$date_font_style.'  ">'.__('Repeat Every','sp_calendar').' ' .$repeat.' '.__('Week(s) on','sp_calendar').' : ';
+		echo '<div style="color:'.$date_color.';font-size:'.$date_size.'px; font-family:'.$date_font.'; '.$date_font_weight.'; '.$date_font_style.'  ">'.__('Repeat Every','sp_calendar').' ' .$repeat.' '.__('Week(s) on','sp_calendar').' : ';
 		for ($i=0;$i<count($weekdays);$i++) 
 		{
 			if($weekdays[$i]!=''){
@@ -2567,22 +2549,22 @@ if($show_repeat==1)
 		echo '</div>';
 		}
 		if($row->repeat_method=='monthly' and $row->month_type==1)
-		echo '<div style="font-size:'.$date_size.'px; font-family:'.$date_font.'; '.$date_font_weight.'; '.$date_font_style.'  ">'.__('Repeat Every','sp_calendar').' ' .$repeat.' '.__('Month(s) on the','sp_calendar').' '.$row->month.'</div>';	
+		echo '<div style="color:'.$date_color.';font-size:'.$date_size.'px; font-family:'.$date_font.'; '.$date_font_weight.'; '.$date_font_style.'  ">'.__('Repeat Every','sp_calendar').' ' .$repeat.' '.__('Month(s) on the','sp_calendar').' '.$row->month.'</div>';	
 
 		if($row->repeat_method=='monthly' and $row->month_type==2)
-		echo '<div style="font-size:'.$date_size.'px; font-family:'.$date_font.'; '.$date_font_weight.'; '.$date_font_style.'  ">'.__('Repeat Every','sp_calendar').' '.$repeat.' '.__('Month(s) on the','sp_calendar').' '.week_number($row->monthly_list).' '.week_convert($row->month_week).'</div>';
+		echo '<div style="color:'.$date_color.';font-size:'.$date_size.'px; font-family:'.$date_font.'; '.$date_font_weight.'; '.$date_font_style.'  ">'.__('Repeat Every','sp_calendar').' '.$repeat.' '.__('Month(s) on the','sp_calendar').' '.week_number($row->monthly_list).' '.week_convert($row->month_week).'</div>';
 
 		if($row->repeat_method=='yearly' and $row->month_type==1)
-		echo '<div style="font-size:'.$date_size.'px; font-family:'.$date_font.'; '.$date_font_weight.'; '.$date_font_style.'  ">'.__('Repeat Every','sp_calendar').' ' .$repeat.' '.__('Year(s) in','sp_calendar').' '.date('F',mktime(0,0,0,$row->year_month + 1,0,0)).' '.__('on the','sp_calendar').' '.$row->month.'</div>';	
+		echo '<div style="color:'.$date_color.';font-size:'.$date_size.'px; font-family:'.$date_font.'; '.$date_font_weight.'; '.$date_font_style.'  ">'.__('Repeat Every','sp_calendar').' ' .$repeat.' '.__('Year(s) in','sp_calendar').' '.date('F',mktime(0,0,0,$row->year_month + 1,0,0)).' '.__('on the','sp_calendar').' '.$row->month.'</div>';	
 
 		if($row->repeat_method=='yearly' and $row->month_type==2)
-		echo '<div style="font-size:'.$date_size.'px; font-family:'.$date_font.'; '.$date_font_weight.'; '.$date_font_style.'  ">'.__('Repeat Every','sp_calendar').' ' .$repeat.' '.__('Year(s) in','sp_calendar').' '.date('F',mktime(0,0,0,$row->year_month + 1,0,0)).' '.__('on the','sp_calendar').' '.week_number($row->monthly_list).' '.week_convert($row->month_week).'</div>';		
+		echo '<div style="color:'.$date_color.';font-size:'.$date_size.'px; font-family:'.$date_font.'; '.$date_font_weight.'; '.$date_font_style.'  ">'.__('Repeat Every','sp_calendar').' ' .$repeat.' '.__('Year(s) in','sp_calendar').' '.date('F',mktime(0,0,0,$row->year_month + 1,0,0)).' '.__('on the','sp_calendar').' '.week_number($row->monthly_list).' '.week_convert($row->month_week).'</div>';		
 
 		
 			}
 					
 					
-					echo '<div style="font-size:'.$title_size.'px; font-family:'.$title_font.'; '.$font_weight.'; '.$font_style.'  ">'.$row->title.'</div>';
+					echo '<div style="color:'.$title_color.';font-size:'.$title_size.'px; font-family:'.$title_font.'; '.$font_weight.'; '.$font_style.'  ">'.$row->title.'</div>';
 
 					echo '<div style="line-height:20px">'.$row->text_for_date.'</div>';
 					
@@ -2593,13 +2575,13 @@ if($show_repeat==1)
 		}
 		else
 		{
-		echo '<div style="font-size:'.$title_size.'px; font-family:'.$title_font.'; '.$font_weight.'; '.$font_style.'  ">'.$row->title.'</div>';
+		echo '<div style="color:'.$title_color.';font-size:'.$title_size.'px; font-family:'.$title_font.'; '.$font_weight.'; '.$font_style.'  ">'.$row->title.'</div>';
 		echo '<h1 style="text-align:center">There Is No Text For This Event</h1>';
 		}
 		echo '</div>';	
 		
 	?>
-	<div style="width:98%;text-align:right; display:<?php if(count($ev_id)==1) echo 'none'; ?>"><a style="font-size:15px; font-family:<?php echo $title_font?>; <?php echo $font_weight?>; <?php echo $font_style?>" href="<?php echo admin_url('admin-ajax.php?action=spiderseemore').'&theme_id='.$theme_id.'&ev_ids='.$ev_ids_inline.'&calendar_id='.$calendar_id.'&date='.$date.''.(($widget)?('&widget=1'):'') ?>">Back to my event list</a></div>
+	<div style="width:98%;text-align:right; display:<?php if(count($ev_id)==1) echo 'none'; ?>"><a style="color:<?php echo $title_color?>;font-size:15px; font-family:<?php echo $title_font?>; <?php echo $font_weight?>; <?php echo $font_style?>" href="<?php echo admin_url('admin-ajax.php?action=spiderseemore').'&theme_id='.$theme_id.'&ev_ids='.$ev_ids_inline.'&calendar_id='.$calendar_id.'&date='.$date.''.(($widget)?('&widget=1'):'') ?>">Back to event list</a></div>
 	</td>
 	
 	<td id="next"  onclick="next([<?php echo $ev_ids_inline ?>],<?php echo $eventID ?>,<?php echo $theme_id ?>,<?php echo $calendar_id ?>,'<?php echo $date ?>',<?php echo $day ?>,'<?php echo $ev_ids_inline ?>')"   style="<?php if(count($ev_id)==1 or $eventID==end($ev_id)) echo 'display:none' ?>;text-align:center" onMouseOver="document.getElementById('next').style.backgroundColor='<?php echo $next_prev_event_bgcolor ?>'" onMouseOut="document.getElementById('next').style.backgroundColor=''" >
@@ -2641,7 +2623,7 @@ if($show_repeat==1)
 <?php
 	}
 
-	die();
+	
 	}
 
 ?>
